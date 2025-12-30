@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Dokumentów - Oficjalny Dokument Prawny</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Georgia&family=Playfair+Display:wght@700&family=Crimson+Text:wght@600&family=Libre+Baskerville&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Specyficzne style dla oficjalnego dokumentu */
+        :root {
+            --official-blue: #003366;
+            --official-red: #8b0000;
+            --official-gold: #d4af37;
+            --official-paper: #f8f8f8;
+            --official-ink: #1a1a1a;
+        }
+        
+        .official-header {
+            background: linear-gradient(to right, var(--official-blue), #002244);
+            color: white;
+            padding: 25px 40px;
+            text-align: center;
+            border-bottom: 6px solid var(--official-gold);
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .official-header h1 {
+            font-family: 'Times New Roman', serif;
+            font-size: 2.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .official-header h2 {
+            font-family: 'Georgia', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--official-gold);
+        }
+        
+        .header-seal {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--official-gold);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.7rem;
+            color: var(--official-blue);
+            text-align: center;
+            padding: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-to-menu.official {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--official-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        /* Oficjalny dokument */
+        .official-document {
+            background: var(--official-paper);
+            border: 2px solid var(--official-blue);
+            border-radius: 0;
+            padding: 50px 60px;
+            font-family: 'Times New Roman', serif;
+            color: var(--official-ink);
+            line-height: 1.8;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .document-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px double var(--official-blue);
+            padding-bottom: 30px;
+        }
+        
+        .document-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            color: var(--official-blue);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .document-subtitle {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.4rem;
+            color: var(--official-red);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .document-content {
+            margin: 40px 0;
+        }
+        
+        .document-section {
+            margin-bottom: 35px;
+        }
+        
+        .section-title {
+            font-family: 'Georgia', serif;
+            font-size: 1.3rem;
+            color: var(--official-blue);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .legal-text {
+            font-size: 1.1rem;
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+        
+        .indent {
+            text-indent: 40px;
+        }
+        
+        .document-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(0, 51, 102, 0.05);
+            border-left: 4px solid var(--official-blue);
+        }
+        
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: var(--official-blue);
+            display: block;
+            margin-bottom: 5px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .detail-value {
+            color: var(--official-ink);
+            font-size: 1.1rem;
+        }
+        
+        .document-footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #ccc;
+        }
+        
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(0, 51, 102, 0.03);
+        }
+        
+        .signature-box {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .signature-line {
+            width: 300px;
+            height: 2px;
+            background: var(--official-ink);
+            margin: 40px auto 10px;
+        }
+        
+        .seal-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .official-seal {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--official-blue);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .seal-text {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--official-blue);
+            font-weight: bold;
+            line-height: 1.2;
+            padding: 0 10px;
+        }
+        
+        .case-number {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            color: var(--official-red);
+            font-weight: bold;
+        }
+        
+        /* Footer dla oficjalnego */
+        .official-footer {
+            background: var(--official-blue);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .official-footer a {
+            color: var(--official-gold);
+            text-decoration: none;
+        }
+        
+        /* Przyciski oficjalne */
+        .btn-official {
+            background: linear-gradient(to right, var(--official-blue), #002244);
+            color: white;
+            border: 2px solid var(--official-gold);
+            font-family: 'Georgia', serif;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        
+        .btn-official:hover {
+            background: linear-gradient(to right, #002244, #001933);
+        }
+    </style>
+</head>
+<body>
+    <!-- Oficjalny Header -->
+    <header class="official-header">
+        <div class="header-seal">
+            STATE OF<br>CALIFORNIA
+        </div>
+        <h1>COUNTY OF BLAINE SHERIFF'S DEPARTMENT</h1>
+        <h2>Official Warrant & Fugitive Declaration Document</h2>
+        <button class="back-to-menu official" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i> Main Menu
+        </button>
+    </header>
+
+    <div class="loading" id="loadingScreen">
+        <div class="spinner"></div>
+        <p>Processing Legal Document...</p>
+    </div>
+
+    <div class="main-app" id="mainApp">
+        <!-- Panel kontrolny dla oficjalnego -->
+        <div class="control-panel official-panel">
+            <div class="panel-header">
+                <h1 style="color: var(--official-blue);">LEGAL DOCUMENT GENERATOR</h1>
+                <h2 style="color: var(--official-blue);">California Penal Code Compliance</h2>
+            </div>
+            
+            <!-- Formularz dostosowany do oficjalnego -->
+            <div class="form-section">
+                <h3 class="section-title" style="color: var(--official-blue);"><i class="fas fa-balance-scale"></i> Case Information</h3>
+                <div class="form-group">
+                    <label class="form-label required">Case Number</label>
+                    <input type="text" id="caseNumber" class="form-input" placeholder="e.g., BCSO-2023-001234">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Court Reference</label>
+                    <input type="text" id="courtReference" class="form-input" placeholder="Superior Court Case Number">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title" style="color: var(--official-blue);"><i class="fas fa-user-tie"></i> Subject Information</h3>
+                <div class="form-group">
+                    <label class="form-label required">Full Legal Name</label>
+                    <input type="text" id="legalName" class="form-input" placeholder="As appears in official records">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">AKA (Also Known As)</label>
+                        <input type="text" id="aka" class="form-input" placeholder="Aliases if any">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">DOB</label>
+                        <input type="date" id="dob" class="form-input">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Height</label>
+                        <input type="text" id="heightLegal" class="form-input" placeholder="Feet & Inches">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Weight</label>
+                        <input type="text" id="weightLegal" class="form-input" placeholder="Pounds">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Known Address</label>
+                    <textarea id="lastAddress" class="form-textarea" placeholder="Last verified residence"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title" style="color: var(--official-blue);"><i class="fas fa-gavel"></i> Charges & Warrant</h3>
+                <div class="form-group">
+                    <label class="form-label required">California Penal Code Section</label>
+                    <select id="penalCode" class="form-select">
+                        <option value="PC 187">PC 187 - Murder</option>
+                        <option value="PC 211">PC 211 - Robbery</option>
+                        <option value="PC 459">PC 459 - Burglary</option>
+                        <option value="PC 207">PC 207 - Kidnapping</option>
+                        <option value="PC 12022.53">PC 12022.53 - Firearm Enhancement</option>
+                        <option value="PC 2800.2">PC 2800.2 - Evading Peace Officer</option>
+                        <option value="custom">Custom Charge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Charges</label>
+                    <textarea id="additionalCharges" class="form-textarea" placeholder="List additional charges if applicable"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Warrant Issue Date</label>
+                        <input type="date" id="warrantDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Warrant Number</label>
+                        <input type="text" id="warrantNumber" class="form-input" placeholder="W-XXXXXX">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bail Amount ($)</label>
+                    <input type="number" id="bailAmount" class="form-input" min="0" value="50000">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title" style="color: var(--official-blue);"><i class="fas fa-landmark"></i> Agency & Authorization</h3>
+                <div class="form-group">
+                    <label class="form-label required">Issuing Judge/Magistrate</label>
+                    <input type="text" id="issuingJudge" class="form-input" placeholder="Honorable Judge Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Arresting/Investigating Officer</label>
+                    <input type="text" id="arrestingOfficer" class="form-input" placeholder="Badge Number & Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department Seal Upload</label>
+                    <div class="logo-section">
+                        <div class="logo-preview-container">
+                            <img id="officialSealPreview" alt="Department Seal">
+                            <div class="logo-placeholder" id="officialSealPlaceholder">
+                                <i class="fas fa-stamp"></i>
+                                <p>NO SEAL</p>
+                                <p>Upload Department Seal</p>
+                            </div>
+                        </div>
+                        <div class="logo-buttons">
+                            <button type="button" id="uploadSealBtn" class="btn btn-official">
+                                <i class="fas fa-upload"></i> Upload Seal
+                            </button>
+                        </div>
+                        <input type="file" id="sealUpload" accept="image/*" class="hidden-input">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="generateLegalDocBtn" class="btn btn-official">
+                    <i class="fas fa-file-contract"></i> Generate Legal Document
+                </button>
+                <button id="clearLegalFormBtn" class="btn btn-danger">
+                    <i class="fas fa-eraser"></i> Clear Form
+                </button>
+            </div>
+        </div>
+        
+        <!-- Podgląd oficjalnego dokumentu -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h2 style="color: var(--official-blue);">Legal Document Preview</h2>
+            </div>
+            <div class="preview-container">
+                <div class="official-document" id="legalDocument">
+                    <div class="case-number" id="caseNumberDisplay">Case: BCSO-XXXXXX</div>
+                    
+                    <div class="document-header">
+                        <h1 class="document-title" id="docTitle">ARREST WARRANT & FUGITIVE DECLARATION</h1>
+                        <div class="document-subtitle" id="docSubtitle">IN THE SUPERIOR COURT OF THE STATE OF CALIFORNIA</div>
+                        <div style="font-family: 'Georgia', serif; color: var(--official-blue); margin-top: 15px;">
+                            COUNTY OF BLAINE - SHERIFF'S DEPARTMENT
+                        </div>
+                    </div>
+                    
+                    <div class="document-content">
+                        <div class="document-section">
+                            <div class="section-title">I. CASE INFORMATION</div>
+                            <p class="legal-text indent">
+                                <strong id="caseInfoText">[CASE INFORMATION WILL APPEAR HERE]</strong>
+                            </p>
+                        </div>
+                        
+                        <div class="document-section">
+                            <div class="section-title">II. SUBJECT INFORMATION</div>
+                            <div class="document-details" id="subjectDetails">
+                                <!-- Details will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <div class="document-section">
+                            <div class="section-title">III. CHARGES & LEGAL AUTHORITY</div>
+                            <p class="legal-text indent" id="chargesText">
+                                [CHARGES AND PENAL CODE SECTIONS WILL APPEAR HERE]
+                            </p>
+                        </div>
+                        
+                        <div class="document-section">
+                            <div class="section-title">IV. WARRANT AUTHORIZATION</div>
+                            <p class="legal-text indent" id="warrantText">
+                                [WARRANT INFORMATION WILL APPEAR HERE]
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="document-footer">
+                        <div class="signature-area">
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-family: 'Georgia', serif; margin-top: 10px;">
+                                    <div id="judgeNameDisplay">[JUDGE NAME]</div>
+                                    <div style="font-size: 0.9rem; color: #666;">Presiding Judge</div>
+                                    <div style="font-size: 0.9rem; color: #666;">Superior Court of California</div>
+                                    <div style="font-size: 0.9rem; color: #666;">County of Blaine</div>
+                                </div>
+                            </div>
+                            <div class="signature-box">
+                                <div class="signature-line"></div>
+                                <div style="font-family: 'Georgia', serif; margin-top: 10px;">
+                                    <div id="officerNameDisplay">[OFFICER NAME]</div>
+                                    <div style="font-size: 0.9rem; color: #666;">Arresting/Investigating Officer</div>
+                                    <div style="font-size: 0.9rem; color: #666;">Blaine County Sheriff's Department</div>
+                                    <div style="font-size: 0.9rem; color: #666;">Badge #: <span id="badgeNumberDisplay">[XXXXX]</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="seal-area">
+                            <div class="official-seal">
+                                <img id="documentSeal" alt="Department Seal" style="display: none; max-width: 90%; max-height: 90%;">
+                                <div class="seal-text" id="sealText">
+                                    STATE OF CALIFORNIA<br>
+                                    COUNTY OF BLAINE<br>
+                                    SHERIFF'S DEPARTMENT<br>
+                                    OFFICIAL SEAL
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 40px; font-family: 'Georgia', serif; font-size: 0.9rem; color: #666;">
+                            <p>This document is generated in compliance with California Penal Code and is valid for execution within the jurisdiction of Blaine County.</p>
+                            <p>Issued pursuant to Article I, Section 28(c) of the California Constitution and relevant provisions of the United States Constitution.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-buttons">
+                    <button id="downloadLegalPdfBtn" class="btn btn-official">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                    <button id="downloadLegalImageBtn" class="btn btn-official">
+                        <i class="fas fa-file-image"></i> Download Image
+                    </button>
+                    <button id="copyLegalImageBtn" class="btn btn-official">
+                        <i class="fas fa-copy"></i> Copy to Clipboard
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stopka oficjalna -->
+        <div class="official-footer">
+            <p>Generated in compliance with California Penal Code | © 2023 Blaine County Sheriff's Department</p>
+            <p>This system is for official use only. Unauthorized access or use is prohibited by law.</p>
+            <p>Stworzone przez: artystek | <a href="index.html">Return to Main Menu</a></p>
+        </div>
+    </div>
+
+    <!-- Biblioteki i skrypt -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="official.js"></script>
+</body>
+</html>
