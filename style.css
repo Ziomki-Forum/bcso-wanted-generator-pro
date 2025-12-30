@@ -1,0 +1,52 @@
+/* ... wszystkie poprzednie style pozostają ... */
+
+/* Dodaj na sam koniec pliku style.css: */
+
+/* Common footer for all pages */
+.main-footer {
+    background: var(--border-brown);
+    color: var(--gold-accent);
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    grid-column: 1 / -1;
+    border-top: 3px solid var(--gold-accent);
+    font-family: 'Special Elite', cursive;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .main-app {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .control-panel, .preview-panel {
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .control-panel, .preview-panel {
+        padding: 20px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn {
+        min-width: 100%;
+    }
+    
+    .action-buttons, .preview-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Print styles removed - no print functionality */
