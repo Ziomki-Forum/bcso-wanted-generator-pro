@@ -5,365 +5,292 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Listów Gończych - Biuro Szeryfa Hrabstwa Blaine</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Old+Standard+TT:wght@400;700&family=Rye&family=Special+Elite&family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Old+Standard+TT:wght@400;700&family=Rye&family=Special+Elite&family=Black+Ops+One&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styl strony głównej */
+        .main-menu {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .menu-header {
+            margin-bottom: 50px;
+        }
+        
+        .menu-title {
+            font-family: 'Rye', cursive;
+            font-size: 4rem;
+            color: #8b0000;
+            text-shadow: 3px 3px 0 #000;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .menu-subtitle {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.5rem;
+            color: #5d2906;
+            letter-spacing: 2px;
+        }
+        
+        .menu-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .menu-card {
+            background: linear-gradient(145deg, #f5e8c6, #e8d4b5);
+            border: 10px solid #5d2906;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+        
+        .menu-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px dashed #d4af37;
+            border-radius: 10px;
+            margin: 10px;
+            pointer-events: none;
+        }
+        
+        .card-icon {
+            font-size: 5rem;
+            color: #8b0000;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-family: 'Black Ops One', cursive;
+            font-size: 2.2rem;
+            color: #2c1810;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .card-description {
+            font-family: 'Old Standard TT', serif;
+            font-size: 1.2rem;
+            color: #5d2906;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .card-features {
+            text-align: left;
+            margin: 25px 0;
+            padding-left: 20px;
+        }
+        
+        .card-features li {
+            margin-bottom: 10px;
+            font-family: 'Special Elite', cursive;
+            color: #2c1810;
+        }
+        
+        .menu-card.western {
+            border-color: #8b4513;
+            background: linear-gradient(145deg, #f5e8c6, #e6d4a8);
+        }
+        
+        .menu-card.official {
+            border-color: #003366;
+            background: linear-gradient(145deg, #f0f8ff, #e6f2ff);
+        }
+        
+        .menu-card.western .card-icon {
+            color: #8b4513;
+        }
+        
+        .menu-card.official .card-icon {
+            color: #003366;
+        }
+        
+        .menu-footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 3px solid #5d2906;
+        }
+        
+        .footer-text {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.1rem;
+            color: #5d2906;
+            margin-top: 20px;
+        }
+        
+        /* Dekoracje */
+        .badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: #8b0000;
+            color: #f5e8c6;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            transform: rotate(5deg);
+            border: 3px solid #d4af37;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 2.8rem;
+            }
+            
+            .menu-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Ładowanie -->
-    <div class="loading" id="loadingScreen">
-        <div class="spinner"></div>
-        <p>Generowanie dokumentu...</p>
-    </div>
-
-    <!-- Główna aplikacja -->
-    <div class="main-app" id="mainApp">
-        <!-- Panel kontrolny -->
-        <div class="control-panel">
-            <div class="panel-header">
-                <h1>GENERATOR LISTÓW GOŃCZYCH</h1>
-                <h2>Biuro Szeryfa Hrabstwa Blaine</h2>
-            </div>
-            
-            <!-- Logo -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fas fa-landmark"></i> Logo Departamentu</h3>
-                <div class="logo-section">
-                    <div class="logo-preview-container">
-                        <img id="logoPreview" alt="Logo departamentu">
-                        <div class="logo-placeholder" id="logoPlaceholder">
-                            <i class="fas fa-badge"></i>
-                            <p>BRAK LOGO</p>
-                            <p>Załaduj logo swojego departamentu</p>
-                        </div>
-                    </div>
-                    <div class="logo-buttons">
-                        <button type="button" id="uploadLogoBtn" class="btn btn-warning">
-                            <i class="fas fa-upload"></i> Załaduj Logo
-                        </button>
-                        <button type="button" id="removeLogoBtn" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Usuń Logo
-                        </button>
-                    </div>
-                    <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
+    <div class="main-menu">
+        <div class="menu-header">
+            <h1 class="menu-title">GENERATOR LISTÓW GOŃCZYCH</h1>
+            <h2 class="menu-subtitle">Biuro Szeryfa Hrabstwa Blaine</h2>
+        </div>
+        
+        <div class="menu-options">
+            <!-- Western Style -->
+            <div class="menu-card western">
+                <div class="badge">STYL WESTERN</div>
+                <div class="card-icon">
+                    <i class="fas fa-hat-cowboy"></i>
                 </div>
-            </div>
-            
-            <!-- Dane -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fas fa-user"></i> Dane Poszukiwanego</h3>
-                <div class="form-group">
-                    <label class="form-label required" for="name">Imię i Nazwisko</label>
-                    <input type="text" id="name" class="form-input" placeholder="Wprowadź pełne imię i nazwisko">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="alias">Przezwisko / Pseudonim</label>
-                        <input type="text" id="alias" class="form-input" placeholder="Znany również jako...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label required" for="age">Wiek</label>
-                        <input type="number" id="age" class="form-input" min="1" max="120" placeholder="Lata">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="height">Wzrost</label>
-                        <input type="number" id="height" class="form-input" min="100" max="250" placeholder="cm">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="weight">Waga</label>
-                        <input type="number" id="weight" class="form-input" min="30" max="200" placeholder="kg">
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Zdjęcie -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fas fa-camera"></i> Zdjęcie Poszukiwanego</h3>
-                <div class="photo-section">
-                    <div class="photo-container">
-                        <img id="photoPreview" alt="Zdjęcie poszukiwanego">
-                        <div class="photo-placeholder" id="photoPlaceholder">
-                            <i class="fas fa-user-secret"></i>
-                            <p>BRAK ZDJĘCIA</p>
-                            <p>Załaduj zdjęcie poszukiwanego</p>
-                        </div>
-                    </div>
-                    <div class="photo-buttons">
-                        <button type="button" id="uploadPhotoBtn" class="btn btn-warning">
-                            <i class="fas fa-upload"></i> Załaduj Zdjęcie
-                        </button>
-                        <button type="button" id="removePhotoBtn" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Usuń Zdjęcie
-                        </button>
-                    </div>
-                    <input type="file" id="photoUpload" accept="image/*" class="hidden-input">
-                </div>
-            </div>
-            
-            <!-- Przestępstwo -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fas fa-gavel"></i> Szczegóły Przestępstwa</h3>
-                <div class="form-group">
-                    <label class="form-label required" for="crime">Przestępstwo</label>
-                    <select id="crime" class="form-select">
-                        <option value="Napad na bank">Napad na bank</option>
-                        <option value="Morderstwo">Morderstwo</option>
-                        <option value="Porwanie">Porwanie</option>
-                        <option value="Kradzież">Kradzież</option>
-                        <option value="Przemyt">Przemyt</option>
-                        <option value="Napaść">Napaść</option>
-                        <option value="Vandalizm">Vandalizm</option>
-                        <option value="custom">-- WŁASNE PRZESTĘPSTWO --</option>
-                    </select>
-                </div>
-                <div class="custom-crime-container" id="customCrimeContainer" style="display: none;">
-                    <input type="text" id="customCrime" class="form-input" placeholder="Wprowadź własne przestępstwo">
-                    <button type="button" id="useCustomCrimeBtn" class="btn btn-warning">Użyj</button>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="crimeDescription">Opis Przestępstwa</label>
-                    <textarea id="crimeDescription" class="form-textarea" placeholder="Szczegółowy opis przestępstwa, okoliczności..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="crimeDate">Data Przestępstwa</label>
-                        <input type="date" id="crimeDate" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="location">Miejsce Przestępstwa</label>
-                        <input type="text" id="location" class="form-input" placeholder="Gdzie popełniono przestępstwo?">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="lastSeen">Ostatnio Widziany</label>
-                    <input type="text" id="lastSeen" class="form-input" placeholder="Ostatnia znana lokalizacja/aktywność">
-                </div>
-            </div>
-            
-            <!-- Numer sprawy i nagroda -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fas fa-file-alt"></i> Numer Sprawy i Nagroda</h3>
-                <div class="form-group">
-                    <label class="form-label" for="caseNumber">Numer Sprawy</label>
-                    <input type="text" id="caseNumber" class="form-input" placeholder="Wprowadź numer sprawy lub zostaw pusty dla automatycznego">
-                </div>
-                <div class="form-group">
-                    <label class="form-label required" for="reward">Wysokość Nagrody ($)</label>
-                    <input type="number" id="reward" class="form-input" min="0" max="1000000" value="5000" placeholder="Nagroda za pomoc w ujęciu">
-                </div>
-            </div>
-            
-            <!-- Podpis -->
-            <div class="form-section signature-section">
-                <h3 class="section-title"><i class="fas fa-signature"></i> Podpis Szeryfa</h3>
-                <div class="form-group">
-                    <label class="form-label required" for="sheriffName">Imię i Nazwisko Szeryfa</label>
-                    <input type="text" id="sheriffName" class="form-input" placeholder="Wpisz imię i nazwisko szeryfa">
-                </div>
-                <div class="signature-container">
-                    <label class="form-label required">Podpis Własnoręczny</label>
-                    <div class="signature-canvas-container">
-                        <canvas id="signatureCanvas"></canvas>
-                    </div>
-                    <div class="signature-buttons">
-                        <button type="button" id="clearSignatureBtn" class="btn btn-danger">
-                            <i class="fas fa-eraser"></i> Wyczyść
-                        </button>
-                        <button type="button" id="undoSignatureBtn" class="btn btn-warning">
-                            <i class="fas fa-undo"></i> Cofnij
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Przyciski -->
-            <div class="action-buttons">
-                <button id="generateBtn" class="btn btn-primary">
-                    <i class="fas fa-sync-alt"></i> Aktualizuj Podgląd
+                <h3 class="card-title">LIST GOŃCZY WESTERN</h3>
+                <p class="card-description">
+                    Klasyczny styl z Dzikiego Zachodu - idealny do gier RPG, imprez tematycznych i projektów artystycznych.
+                </p>
+                <ul class="card-features">
+                    <li>✓ Styl gazetowy z efektem postarzenia</li>
+                    <li>✓ Elementy dekoracyjne w stylu western</li>
+                    <li>✓ Dziury po kulach i ozdobne ramki</li>
+                    <li>✓ Wysoka nagroda z wyraźnym akcentem</li>
+                    <li>✓ Podpis z ręcznie rysowaną pieczęcią</li>
+                </ul>
+                <button onclick="window.location.href='western.html'" class="btn btn-warning" style="padding: 15px 40px; font-size: 1.3rem;">
+                    <i class="fas fa-play"></i> Stwórz Western List
                 </button>
-                <button id="generateFinalBtn" class="btn btn-success">
-                    <i class="fas fa-file-contract"></i> Generuj Gotowy Dokument
-                </button>
-                <button id="clearFormBtn" class="btn btn-danger">
-                    <i class="fas fa-broom"></i> Wyczyść Wszystko
+            </div>
+            
+            <!-- Official Style -->
+            <div class="menu-card official">
+                <div class="badge" style="background: #003366;">OFICJALNY</div>
+                <div class="card-icon">
+                    <i class="fas fa-scale-balanced"></i>
+                </div>
+                <h3 class="card-title">OFICJALNY DOKUMENT</h3>
+                <p class="card-description">
+                    Formalny dokument zgodny z prawem stanowym Kalifornii - wzorowany na prawdziwych dokumentach sądowych.
+                </p>
+                <ul class="card-features">
+                    <li>✓ Wzór zgodny z Konstytucją USA</li>
+                    <li>✓ Formalny język prawniczy</li>
+                    <li>✓ Pieczęć stanowa i numeracja</li>
+                    <li>✓ Sekcje zgodne z prawem karnym</li>
+                    <li>✓ Profesjonalny układ dokumentu</li>
+                </ul>
+                <button onclick="window.location.href='official.html'" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.3rem; background: linear-gradient(to right, #003366, #002244);">
+                    <i class="fas fa-gavel"></i> Stwórz Oficjalny Dokument
                 </button>
             </div>
         </div>
         
-        <!-- Panel podglądu -->
-        <div class="preview-panel">
-            <div class="preview-header">
-                <h2>Podgląd Listu Gończego</h2>
-            </div>
-            <div class="preview-container">
-                <div class="wanted-poster" id="wantedPoster">
-                    <div class="watermark" id="watermarkText">POSZUKIWANY</div>
-                    <div class="poster-header">
-                        <div class="agency-logo-container">
-                            <img id="agencyLogo" class="agency-logo" alt="Logo agencji">
-                            <div>
-                                <div class="agency-name" id="agencyName">BIURO SZERYFA HRABSTWA BLAINE</div>
-                                <div class="wanted-title">POSZUKIWANY</div>
-                                <div class="wanted-subtitle" id="wantedSubtitle">ZA PRZESTĘPSTWA PRZECIWKO PRAWU</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="poster-content">
-                        <div class="photo-column">
-                            <div class="wanted-photo-container">
-                                <img id="wantedPhoto" alt="Zdjęcie poszukiwanego">
-                                <div class="wanted-photo-placeholder" id="wantedPhotoPlaceholder">
-                                    <i class="fas fa-user-secret"></i>
-                                    <p>BRAK ZDJĘCIA</p>
-                                    <p>DOSTĘPNEGO</p>
-                                </div>
-                            </div>
-                            <div class="photo-label">WIZERUNEK POSZUKIWANEGO</div>
-                        </div>
-                        <div class="details-column">
-                            <div class="case-number" id="caseNumberDisplay">SPRAWA NR: BCSO-#####</div>
-                            <div class="wanted-details">
-                                <div class="detail-row">
-                                    <span class="detail-label">IMIĘ I NAZWISKO:</span>
-                                    <span class="detail-value" id="detailName">[PEŁNE IMIĘ I NAZWISKO]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">PRZEZWISKO:</span>
-                                    <span class="detail-value" id="detailAlias">[BRAK PRZEZWISKA]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">WIEK:</span>
-                                    <span class="detail-value" id="detailAge">[WIEK] lat</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">BUDOWA CIAŁA:</span>
-                                    <span class="detail-value" id="detailPhysique">[NIE OKREŚLONO]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">PRZESTĘPSTWO:</span>
-                                    <span class="detail-value" id="detailCrime" style="color: var(--ink-red); font-weight: bold;">[RODZAJ PRZESTĘPSTWA]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">DATA PRZESTĘPSTWA:</span>
-                                    <span class="detail-value" id="detailCrimeDate">[NIEZNANA]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">MIEJSCE:</span>
-                                    <span class="detail-value" id="detailLocation">[NIEZNANE]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">OPIS:</span>
-                                    <span class="detail-value" id="detailDescription">[OPIS PRZESTĘPSTWA]</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">OSTATNIO WIDZIANY:</span>
-                                    <span class="detail-value" id="detailLastSeen">[NIEZNANE]</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="poster-footer">
-                        <div class="reward-container">
-                            NAGRODA<br>
-                            <span class="reward-amount">$<span id="detailReward">[NAGRODA]</span></span>
-                        </div>
-                        <div class="warning-text">OSTRZEŻENIE: UWAŻANY ZA NIEBEZPIECZNEGO I UZBROJONEGO</div>
-                        <div class="contact-info">Informacje proszę zgłaszać do: BIURA SZERYFA • HRABSTWO BLAINE</div>
-                        <div class="signature-stamp-container">
-                            <div class="stamp-final">
-                                <div class="final-stamp">
-                                    <img id="finalStampLogo" class="stamp-logo" alt="Logo na pieczątce">
-                                    <div class="stamp-text-overlay">
-                                        <div class="stamp-text" style="font-size: 0.9rem;">OFICJALNA</div>
-                                        <div class="stamp-text" style="font-size: 1rem; color: var(--ink-red);">PIECZĘĆ</div>
-                                        <div class="stamp-text" style="font-size: 0.8rem;">HRABSTWA BLAINE</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="signature-final">
-                                <img id="finalSignatureImage" alt="Podpis szeryfa">
-                                <div class="sheriff-name-final" id="finalSheriffName">[IMIĘ I NAZWISKO SZERYFA]</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="preview-buttons">
-                    <button id="downloadPdfBtn" class="btn btn-success">
-                        <i class="fas fa-file-pdf"></i> Pobierz PDF
-                    </button>
-                    <button id="downloadImageBtn" class="btn btn-warning">
-                        <i class="fas fa-file-image"></i> Pobierz Obraz
-                    </button>
-                    <button id="copyImageBtn" class="btn btn-primary">
-                        <i class="fas fa-copy"></i> Kopiuj Grafike
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Stopka główna -->
-        <div class="main-footer">
-            <p>Stworzone przez: artystek</p>
-            <p>Generator Listów Gończych BCSO - Wersja Finalna</p>
-        </div>
-    </div>
-    
-    <!-- Modal -->
-    <div class="modal" id="generateModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeModalBtn">&times;</button>
-            <h3 class="modal-title">Generowanie dokumentu</h3>
-            <p class="modal-text">Wybierz format dokumentu:</p>
-            <div class="modal-buttons">
-                <button id="generatePdfBtn" class="btn btn-success">Generuj PDF</button>
-                <button id="generateImageBtn" class="btn btn-warning">Generuj Obraz</button>
-                <button id="cancelGenerateBtn" class="btn btn-danger">Anuluj</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Strona wynikowa -->
-    <div class="result-page" id="resultPage">
-        <button class="back-button" id="backToGeneratorBtn">
-            <i class="fas fa-arrow-left"></i> Powrót do Generatora
-        </button>
-        <div class="result-container">
-            <div class="result-header">
-                <h1>GOTOWY LIST GOŃCZY</h1>
-                <p>Dokument gotowy do zrobienia screena</p>
-            </div>
-            <div class="result-instructions">
-                <h3>📸 Jak zrobić screena:</h3>
-                <ol>
-                    <li><strong>Windows:</strong> Naciśnij <kbd>PrtScn</kbd> lub <kbd>Win + Shift + S</kbd></li>
-                    <li><strong>Mac:</strong> Naciśnij <kbd>Shift + Command + 4</kbd></li>
-                    <li><strong>Linux:</strong> Naciśnij <kbd>PrtScn</kbd> lub użyj narzędzia "Zrzut ekranu"</li>
-                    <li>Możesz też pobrać gotowy plik poniżej</li>
-                </ol>
-            </div>
-            <div id="finalDocumentContainer"></div>
-            <div class="result-actions">
-                <button id="resultDownloadPdfBtn" class="btn btn-success">
-                    <i class="fas fa-file-pdf"></i> Pobierz PDF
-                </button>
-                <button id="resultDownloadImageBtn" class="btn btn-warning">
-                    <i class="fas fa-file-image"></i> Pobierz Obraz
-                </button>
-                <button id="resultCopyImageBtn" class="btn btn-primary">
-                    <i class="fas fa-copy"></i> Kopiuj do Schowka
-                </button>
-            </div>
-            <div class="result-footer">
+        <div class="menu-footer">
+            <p style="font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #5d2906; margin-bottom: 20px;">
+                "Sprawiedliwość musi być widoczna, a prawo - egzekwowane"
+            </p>
+            <p class="footer-text">
+                Art. IV, Sekcja 4 Konstytucji Stanów Zjednoczonych<br>
+                Dział 1, Rozdział 1 Kodeksu Karnego Kalifornii
+            </p>
+            <div class="footer-text" style="margin-top: 40px;">
                 <p>Stworzone przez: artystek</p>
+                <p>© 2023 Biuro Szeryfa Hrabstwa Blaine. Wszystkie prawa zastrzeżone.</p>
             </div>
         </div>
     </div>
 
-    <!-- Biblioteki -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="app.js"></script>
+    <style>
+        .btn {
+            padding: 16px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, #d4af37, #b8941f);
+            color: #2c1810;
+            border: 3px solid #8b4513;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.6);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #003366, #002244);
+            color: white;
+            border: 3px solid #d4af37;
+            box-shadow: 0 8px 20px rgba(0, 51, 102, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 51, 102, 0.6);
+        }
+    </style>
 </body>
 </html>
