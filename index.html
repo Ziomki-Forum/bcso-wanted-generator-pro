@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Listów Gończych - Biuro Szeryfa Hrabstwa Blaine</title>
+    <!-- Biblioteki -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Old+Standard+TT:wght@400;700&family=Rye&family=Special+Elite&family=Black+Ops+One&family=Playfair+Display:wght@400;700&family=Cinzel:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* RESET I PODSTAWY */
+        :root {
+            --primary-black: #0a0a0a;
+            --paper-yellow: #f5e8c6;
+            --paper-aged: #e8d4b5;
+            --ink-red: #8b0000;
+            --ink-dark: #2c1810;
+            --gold-accent: #d4af37;
+            --border-brown: #5d2906;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-heavy: rgba(0, 0, 0, 0.3);
+            --formal-blue: #1a365d;
+            --formal-gray: #4a5568;
+            --formal-gold: #b58900;
+            --seal-red: #8b0000;
+            --light-gray: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Old Standard TT', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* GŁÓWNY KONTENER */
+        .main-app {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            min-height: calc(100vh - 40px);
+        }
+        
+        /* PANEL KONTROLNY - LEWA STRONA */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            border: 5px solid var(--border-brown);
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+        }
+        
+        .panel-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--ink-red);
+        }
+        
+        .panel-header h1 {
+            font-family: 'Rye', cursive;
+            font-size: 2.8rem;
+            color: var(--ink-red);
+            text-shadow: 2px 2px 0 var(--shadow-heavy);
+            letter-spacing: 2px;
+        }
+        
+        .panel-header h2 {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.4rem;
+            color: var(--border-brown);
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        
+        /* PRZEŁĄCZNIK STYLU */
+        .style-switcher {
+            background: rgba(248, 248, 248, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 3px solid var(--border-brown);
+            text-align: center;
+        }
+        
+        .style-switcher h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--ink-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .style-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .style-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .style-btn-western {
+            background: linear-gradient(to right, var(--ink-red), #6b0000);
+            color: white;
+            border: 3px solid var(--gold-accent);
+        }
+        
+        .style-btn-formal {
+            background: linear-gradient(to right, var(--formal-blue), #2d3748);
+            color: white;
+            border: 3px solid var(--formal-gold);
+        }
+        
+        .style-btn.active {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* SEKCJE FORMULARZA */
+        .form-section {
+            background: rgba(248, 248, 248, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 6px solid var(--ink-red);
+            box-shadow: 0 5px 15px var(--shadow-light);
+        }
+        
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--ink-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--gold-accent);
+            padding-bottom: 10px;
+        }
+        
+        .section-title i {
+            color: var(--ink-red);
+        }
+        
+        /* GRUPY FORMULARZA */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--ink-dark);
+            font-size: 1.1rem;
+            font-family: 'Special Elite', cursive;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--ink-red);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Old Standard TT', serif;
+            transition: all 0.3s;
+            background: white;
+            color: var(--ink-dark);
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--ink-red);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* LOGO DEPARTAMENTU */
+        .logo-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            border: 3px dashed #ccc;
+            margin-bottom: 25px;
+        }
+        
+        .logo-preview-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border: 5px solid var(--border-brown);
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #logoPreview {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .logo-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .logo-placeholder i {
+            font-size: 3rem;
+            color: var(--border-brown);
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+        
+        .logo-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        /* ZDJĘCIE POSZUKIWANEGO */
+        .photo-section {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .photo-container {
+            width: 300px;
+            height: 350px;
+            margin: 0 auto 20px;
+            border: 8px solid var(--border-brown);
+            border-radius: 5px;
+            overflow: hidden;
+            background: linear-gradient(145deg, #ddd 0%, #bbb 100%);
+            position: relative;
+        }
+        
+        #photoPreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--ink-dark);
+            font-size: 1.1rem;
+            padding: 20px;
+        }
+        
+        .photo-placeholder i {
+            font-size: 4rem;
+            color: var(--border-brown);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .photo-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        /* PODPIS */
+        .signature-section {
+            background: rgba(255, 248, 230, 0.9);
+            border: 3px solid var(--border-brown);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+        
+        .signature-container {
+            margin-bottom: 25px;
+        }
+        
+        .signature-canvas-container {
+            border: 3px solid var(--ink-dark);
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #signatureCanvas {
+            width: 100%;
+            height: 180px;
+            cursor: crosshair;
+            display: block;
+            background: white;
+        }
+        
+        .signature-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* PRZYCISKI */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 200px;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--ink-red), #6b0000);
+            color: white;
+            border: 3px solid var(--gold-accent);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(139, 0, 0, 0.6);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, #2d5016, #3d6a20);
+            color: white;
+            border: 3px solid #7cb356;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(45, 80, 22, 0.6);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, var(--gold-accent), #b8941f);
+            color: var(--ink-dark);
+            border: 3px solid var(--border-brown);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.6);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #dc3545, #c82333);
+            color: white;
+            border: 3px solid #ff6b6b;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(220, 53, 69, 0.6);
+        }
+        
+        /* PANEL PODGLĄDU - PRAWA STRONA */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 5px solid var(--border-brown);
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--ink-red);
+        }
+        
+        .preview-header h2 {
+            font-family: 'Rye', cursive;
+            font-size: 2.5rem;
+            color: var(--ink-red);
+            text-shadow: 2px 2px 0 var(--shadow-heavy);
+            letter-spacing: 2px;
+        }
+        
+        .preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* LIST GOŃCZY - STYL WESTERN (DOMYŚLNY) */
+        .wanted-poster {
+            flex: 1;
+            background: var(--paper-yellow);
+            border: 15px solid var(--border-brown);
+            border-radius: 5px;
+            padding: 40px;
+            font-family: 'Old Standard TT', serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 50px rgba(139, 69, 19, 0.1);
+            min-height: 1100px;
+        }
+        
+        /* LIST GOŃCZY - STYL FORMALNY (POPRAWIONY) */
+        .wanted-poster.formal {
+            background: white;
+            border: 2px solid var(--formal-blue);
+            border-radius: 0;
+            padding: 40px;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background-image: 
+                linear-gradient(rgba(26, 54, 93, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 54, 93, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            position: relative;
+        }
+        
+        .wanted-poster.formal::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid rgba(26, 54, 93, 0.1);
+            pointer-events: none;
+        }
+        
+        .wanted-poster.formal .watermark {
+            color: rgba(26, 54, 93, 0.03);
+            font-family: 'Cinzel', serif;
+            font-size: 6rem;
+            letter-spacing: 10px;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .wanted-poster.formal .agency-name {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: var(--formal-blue);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 1.5px;
+            text-shadow: none;
+            border-bottom: 2px solid var(--formal-gold);
+            padding-bottom: 10px;
+        }
+        
+        .wanted-poster.formal .agency-subtitle {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            color: var(--formal-gray);
+            margin-bottom: 15px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .wanted-poster.formal .legal-citation {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--formal-gray);
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: var(--light-gray);
+            border-left: 3px solid var(--formal-gold);
+            border-radius: 3px;
+        }
+        
+        .wanted-poster.formal .wanted-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--formal-blue);
+            letter-spacing: 2px;
+            border-bottom: 3px solid var(--formal-blue);
+            padding-bottom: 15px;
+            margin: 20px 0 15px;
+            text-align: center;
+        }
+        
+        .wanted-poster.formal .wanted-title::before,
+        .wanted-poster.formal .wanted-title::after {
+            display: none;
+        }
+        
+        .wanted-poster.formal .wanted-subtitle {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.4rem;
+            color: var(--formal-gray);
+            letter-spacing: 0.5px;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .wanted-poster.formal .wanted-photo-container {
+            border: 3px solid var(--formal-gray);
+            border-radius: 2px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        
+        .wanted-poster.formal .wanted-photo-container::after {
+            content: "ID PHOTO";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--formal-blue);
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .wanted-poster.formal .photo-label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            color: var(--formal-gray);
+            border: 1px solid var(--border-gray);
+            background: var(--light-gray);
+            padding: 8px;
+            border-radius: 3px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .wanted-poster.formal .case-number {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--formal-blue);
+            background: var(--light-gray);
+            border-left: 4px solid var(--formal-gold);
+            text-align: left;
+            padding: 12px 15px;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .wanted-poster.formal .wanted-details {
+            background: var(--light-gray);
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 20px;
+        }
+        
+        .wanted-poster.formal .detail-row {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .wanted-poster.formal .detail-label {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+            color: var(--formal-blue);
+            font-size: 1rem;
+            min-width: 180px;
+            padding-right: 15px;
+            letter-spacing: 0.3px;
+        }
+        
+        .wanted-poster.formal .detail-value {
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.4;
+            flex: 1;
+        }
+        
+        .wanted-poster.formal .reward-container {
+            background: linear-gradient(135deg, var(--formal-blue), #2d3748);
+            color: white;
+            border: 2px solid var(--formal-gold);
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.5rem;
+            transform: rotate(0deg);
+            right: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            padding: 15px 25px;
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .wanted-poster.formal .reward-label {
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+        
+        .wanted-poster.formal .reward-amount {
+            color: var(--formal-gold);
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .wanted-poster.formal .warning-text {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.2rem;
+            color: var(--seal-red);
+            background: #fff5f5;
+            padding: 12px 15px;
+            border-radius: 3px;
+            border-left: 4px solid var(--seal-red);
+            margin: 20px 0;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .wanted-poster.formal .contact-info {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            color: var(--formal-gray);
+            font-style: normal;
+            background: var(--light-gray);
+            padding: 12px 15px;
+            border-radius: 3px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .wanted-poster.formal .signature-stamp-container {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .wanted-poster.formal .signature-stamp-container::before {
+            content: "ORIGINAL DOCUMENT";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 15px;
+            color: var(--formal-blue);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .wanted-poster.formal .final-stamp {
+            border: 3px solid var(--formal-blue);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            width: 140px;
+            height: 140px;
+        }
+        
+        .wanted-poster.formal .stamp-text {
+            font-family: 'Courier New', monospace;
+            color: var(--formal-blue);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .wanted-poster.formal .stamp-text-overlay {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px;
+            border-radius: 2px;
+        }
+        
+        .wanted-poster.formal #finalSignatureImage {
+            max-width: 300px;
+            max-height: 80px;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.1));
+        }
+        
+        .wanted-poster.formal .sheriff-name-final {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.3rem;
+            color: var(--formal-blue);
+            border-top: 1px solid var(--formal-gray);
+            padding-top: 5px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .wanted-poster.formal .sheriff-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.9rem;
+            color: var(--formal-gray);
+            margin-top: 3px;
+            font-weight: 400;
+        }
+        
+        /* Reszta oryginalnych stylów pozostaje bez zmian... */
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-family: 'Anton', sans-serif;
+            font-size: 8rem;
+            color: rgba(139, 0, 0, 0.08);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+            letter-spacing: 20px;
+            text-transform: uppercase;
+        }
+        
+        .poster-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .agency-logo-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .agency-logo {
+            max-height: 100px;
+            max-width: 200px;
+            display: none;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .agency-name:not(.formal) {
+            font-family: 'Anton', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: 4px;
+            color: var(--ink-red);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .wanted-title:not(.formal) {
+            font-family: 'Black Ops One', cursive;
+            font-size: 5.5rem;
+            letter-spacing: 6px;
+            color: var(--primary-black);
+            margin: 10px 0;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+            padding: 0 30px;
+        }
+        
+        .wanted-title:not(.formal)::before, .wanted-title:not(.formal)::after {
+            content: "✹";
+            color: var(--ink-red);
+            font-size: 3.5rem;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .wanted-title:not(.formal)::before {
+            left: -15px;
+        }
+        
+        .wanted-title:not(.formal)::after {
+            right: -15px;
+        }
+        
+        .wanted-subtitle:not(.formal) {
+            font-family: 'Special Elite', cursive;
+            font-size: 2.2rem;
+            color: var(--ink-dark);
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .poster-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .photo-column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .wanted-photo-container:not(.formal) {
+            flex: 1;
+            border: 12px solid var(--border-brown);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: linear-gradient(145deg, #aaa 0%, #888 100%);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        #wantedPhoto {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .wanted-photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #bbb 0%, #999 100%);
+            color: var(--ink-dark);
+            font-size: 1.2rem;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .wanted-photo-placeholder i {
+            font-size: 4rem;
+            color: var(--border-brown);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .photo-label:not(.formal) {
+            text-align: center;
+            font-family: 'Special Elite', cursive;
+            font-size: 1.4rem;
+            color: var(--ink-dark);
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 5px;
+            border: 3px dashed var(--border-brown);
+        }
+        
+        .details-column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .case-number:not(.formal) {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.6rem;
+            color: var(--ink-red);
+            margin-bottom: 25px;
+            padding: 12px;
+            background: rgba(139, 0, 0, 0.05);
+            border-radius: 8px;
+            border-left: 6px solid var(--ink-red);
+            text-align: center;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .wanted-details:not(.formal) {
+            flex: 1;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            border: 3px solid var(--border-brown);
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .detail-row:not(.formal) {
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .detail-label:not(.formal) {
+            font-weight: bold;
+            color: var(--ink-dark);
+            min-width: 180px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .detail-value:not(.formal) {
+            flex: 1;
+            color: var(--ink-dark);
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+        
+        .poster-footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 5px double var(--border-brown);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .reward-container:not(.formal) {
+            position: absolute;
+            top: -60px;
+            right: 50px;
+            background: linear-gradient(135deg, var(--gold-accent), #b8941f);
+            color: var(--ink-dark);
+            padding: 20px 35px;
+            border-radius: 10px;
+            font-family: 'Black Ops One', cursive;
+            font-size: 2.5rem;
+            border: 8px double var(--border-brown);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            transform: rotate(5deg);
+            z-index: 10;
+            text-align: center;
+            min-width: 300px;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .reward-amount:not(.formal) {
+            font-size: 3rem;
+            color: var(--ink-red);
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .warning-text:not(.formal) {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            color: var(--ink-red);
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .contact-info:not(.formal) {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--ink-dark);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .signature-stamp-container:not(.formal) {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 3px solid var(--border-brown);
+            min-height: 200px;
+        }
+        
+        .stamp-final {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 0 200px;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .final-stamp:not(.formal) {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 5px solid var(--ink-red);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .stamp-logo {
+            max-width: 120px;
+            max-height: 120px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 1;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .stamp-text-overlay:not(.formal) {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(139, 0, 0, 0.2);
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .stamp-text:not(.formal) {
+            font-family: 'Special Elite', cursive;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--ink-dark);
+            font-weight: bold;
+            line-height: 1.2;
+        }
+        
+        .signature-final {
+            flex: 1;
+            text-align: right;
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+            min-height: 150px;
+        }
+        
+        #finalSignatureImage {
+            max-width: 350px;
+            max-height: 100px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            display: none;
+        }
+        
+        /* Dla stylu western (pozostaje oryginalne) */
+        .sheriff-name-final:not(.formal) {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.8rem;
+            color: var(--ink-dark);
+            font-weight: bold;
+            border-top: 3px solid var(--border-brown);
+            padding-top: 8px;
+            margin-top: 10px;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        /* PRZYCISKI PODGLĄDU */
+        .preview-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .preview-buttons .btn {
+            flex: 1;
+            padding: 18px 30px;
+            font-size: 1.2rem;
+        }
+        
+        /* STOPKA GŁÓWNA */
+        .main-footer {
+            background: var(--border-brown);
+            color: var(--gold-accent);
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            grid-column: 1 / -1;
+            border-top: 3px solid var(--gold-accent);
+            font-family: 'Special Elite', cursive;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1400px) {
+            .main-app {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .control-panel, .preview-panel {
+                max-height: none;
+            }
+            
+            .poster-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .photo-column {
+                order: 1;
+            }
+            
+            .details-column {
+                order: 2;
+            }
+            
+            .reward-container {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: -60px auto 30px;
+                transform: none;
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .wanted-poster.formal .reward-container {
+                position: relative;
+                margin: -40px auto 30px;
+                transform: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .control-panel, .preview-panel {
+                padding: 20px;
+            }
+            
+            .wanted-title {
+                font-size: 3.5rem;
+            }
+            
+            .wanted-poster.formal .wanted-title {
+                font-size: 2.5rem;
+            }
+            
+            .agency-name {
+                font-size: 2.2rem;
+            }
+            
+            .wanted-poster.formal .agency-name {
+                font-size: 1.8rem;
+            }
+            
+            .reward-container {
+                font-size: 2rem;
+                min-width: 250px;
+                margin: -40px auto 20px;
+            }
+            
+            .wanted-poster.formal .reward-container {
+                font-size: 1.3rem;
+                min-width: 220px;
+                padding: 12px 20px;
+            }
+            
+            .wanted-poster.formal .reward-amount {
+                font-size: 1.8rem;
+            }
+            
+            .reward-amount {
+                font-size: 2.2rem;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                min-width: 100%;
+            }
+            
+            .action-buttons, .preview-buttons {
+                flex-direction: column;
+            }
+            
+            .signature-stamp-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 25px;
+                text-align: center;
+            }
+            
+            .signature-final {
+                text-align: center;
+                padding-right: 0;
+                align-items: center;
+            }
+            
+            .stamp-final {
+                flex: 0 0 auto;
+            }
+        }
+        
+        /* UKRYTE INPUTY */
+        .hidden-input {
+            display: none;
+        }
+        
+        /* STYL DLA CUSTOM CRIME */
+        .custom-crime-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .custom-crime-container .form-input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- GŁÓWNY KONTENER -->
+    <div class="main-app">
+        <!-- PANEL KONTROLNY -->
+        <div class="control-panel">
+            <div class="panel-header">
+                <h1>GENERATOR LISTÓW GOŃCZYCH</h1>
+                <h2>Biuro Szeryfa Hrabstwa Blaine</h2>
+            </div>
+            
+            <!-- PRZEŁĄCZNIK STYLU -->
+            <div class="style-switcher">
+                <h3><i class="fas fa-palette"></i> Wybierz styl listu</h3>
+                <div class="style-buttons">
+                    <button id="westernStyleBtn" class="style-btn style-btn-western active">
+                        <i class="fas fa-hat-cowboy"></i> Western
+                    </button>
+                    <button id="formalStyleBtn" class="style-btn style-btn-formal">
+                        <i class="fas fa-file-contract"></i> Formalny
+                    </button>
+                </div>
+            </div>
+            
+            <!-- LOGO DEPARTAMENTU -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-landmark"></i> Logo Departamentu</h3>
+                <div class="logo-section">
+                    <div class="logo-preview-container">
+                        <img id="logoPreview" alt="Logo departamentu">
+                        <div class="logo-placeholder" id="logoPlaceholder">
+                            <i class="fas fa-badge"></i>
+                            <p>BRAK LOGO</p>
+                            <p>Załaduj logo swojego departamentu</p>
+                        </div>
+                    </div>
+                    <div class="logo-buttons">
+                        <button type="button" id="uploadLogoBtn" class="btn btn-warning">
+                            <i class="fas fa-upload"></i> Załaduj Logo
+                        </button>
+                        <button type="button" id="removeLogoBtn" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Usuń Logo
+                        </button>
+                    </div>
+                    <input type="file" id="logoUpload" accept="image/*" class="hidden-input">
+                </div>
+            </div>
+            
+            <!-- DANE POSZUKIWANEGO -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-user"></i> Dane Poszukiwanego</h3>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="name">Imię i Nazwisko</label>
+                    <input type="text" id="name" class="form-input" placeholder="Wprowadź pełne imię i nazwisko">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="alias">Przezwisko / Pseudonim</label>
+                        <input type="text" id="alias" class="form-input" placeholder="Znany również jako...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="age">Wiek</label>
+                        <input type="number" id="age" class="form-input" min="1" max="120" placeholder="Lata">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="height">Wzrost</label>
+                        <input type="number" id="height" class="form-input" min="100" max="250" placeholder="cm">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="weight">Waga</label>
+                        <input type="number" id="weight" class="form-input" min="30" max="200" placeholder="kg">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ZDJĘCIE -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-camera"></i> Zdjęcie Poszukiwanego</h3>
+                <div class="photo-section">
+                    <div class="photo-container">
+                        <img id="photoPreview" alt="Zdjęcie poszukiwanego">
+                        <div class="photo-placeholder" id="photoPlaceholder">
+                            <i class="fas fa-user-secret"></i>
+                            <p>BRAK ZDJĘCIA</p>
+                            <p>Załaduj zdjęcie poszukiwanego</p>
+                        </div>
+                    </div>
+                    <div class="photo-buttons">
+                        <button type="button" id="uploadPhotoBtn" class="btn btn-warning">
+                            <i class="fas fa-upload"></i> Załaduj Zdjęcie
+                        </button>
+                        <button type="button" id="removePhotoBtn" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Usuń Zdjęcie
+                        </button>
+                    </div>
+                    <input type="file" id="photoUpload" accept="image/*" class="hidden-input">
+                </div>
+            </div>
+            
+            <!-- PRZESTĘPSTWO -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-gavel"></i> Szczegóły Przestępstwa</h3>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="crime">Przestępstwo</label>
+                    <select id="crime" class="form-select">
+                        <option value="Napad na bank">Napad na bank</option>
+                        <option value="Morderstwo">Morderstwo</option>
+                        <option value="Porwanie">Porwanie</option>
+                        <option value="Kradzież">Kradzież</option>
+                        <option value="Przemyt">Przemyt</option>
+                        <option value="Napaść">Napaść</option>
+                        <option value="Vandalizm">Vandalizm</option>
+                        <option value="custom">-- WŁASNE PRZESTĘPSTWO --</option>
+                    </select>
+                </div>
+                
+                <div class="custom-crime-container" id="customCrimeContainer" style="display: none;">
+                    <input type="text" id="customCrime" class="form-input" placeholder="Wprowadź własne przestępstwo">
+                    <button type="button" id="useCustomCrimeBtn" class="btn btn-warning">Użyj</button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="crimeDescription">Opis Przestępstwa</label>
+                    <textarea id="crimeDescription" class="form-textarea" placeholder="Szczegółowy opis przestępstwa, okoliczności..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="crimeDate">Data Przestępstwa</label>
+                        <input type="date" id="crimeDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="location">Miejsce Przestępstwa</label>
+                        <input type="text" id="location" class="form-input" placeholder="Gdzie popełniono przestępstwo?">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="lastSeen">Ostatnio Widziany</label>
+                    <input type="text" id="lastSeen" class="form-input" placeholder="Ostatnia znana lokalizacja/aktywność">
+                </div>
+            </div>
+            
+            <!-- NUMER SPRAWY I NAGRODA -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-file-alt"></i> Numer Sprawy i Nagroda</h3>
+                
+                <div class="form-group">
+                    <label class="form-label" for="caseNumber">Numer Sprawy</label>
+                    <input type="text" id="caseNumber" class="form-input" placeholder="Wprowadź numer sprawy lub zostaw pusty dla automatycznego">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="reward">Wysokość Nagrody ($)</label>
+                    <input type="number" id="reward" class="form-input" min="0" max="1000000" value="5000" placeholder="Nagroda za pomoc w ujęciu">
+                </div>
+            </div>
+            
+            <!-- PODPIS SZERYFA -->
+            <div class="form-section signature-section">
+                <h3 class="section-title"><i class="fas fa-signature"></i> Podpis Szeryfa</h3>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="sheriffName">Imię i Nazwisko Szeryfa</label>
+                    <input type="text" id="sheriffName" class="form-input" placeholder="Wpisz imię i nazwisko szeryfa">
+                </div>
+                
+                <div class="signature-container">
+                    <label class="form-label required">Podpis Własnoręczny</label>
+                    <div class="signature-canvas-container">
+                        <canvas id="signatureCanvas"></canvas>
+                    </div>
+                    <div class="signature-buttons">
+                        <button type="button" id="clearSignatureBtn" class="btn btn-danger">
+                            <i class="fas fa-eraser"></i> Wyczyść
+                        </button>
+                        <button type="button" id="undoSignatureBtn" class="btn btn-warning">
+                            <i class="fas fa-undo"></i> Cofnij
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PRZYCISKI AKCJI -->
+            <div class="action-buttons">
+                <button id="generateBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Aktualizuj Podgląd
+                </button>
+                <button id="clearFormBtn" class="btn btn-danger">
+                    <i class="fas fa-broom"></i> Wyczyść Wszystko
+                </button>
+            </div>
+        </div>
+        
+        <!-- PANEL PODGLĄDU -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <h2>Podgląd Listu Gończego</h2>
+            </div>
+            
+            <div class="preview-container">
+                <div class="wanted-poster" id="wantedPoster">
+                    <!-- WATERMARK -->
+                    <div class="watermark" id="watermarkText">POSZUKIWANY</div>
+                    
+                    <!-- NAGŁÓWEK -->
+                    <div class="poster-header">
+                        <div class="agency-logo-container">
+                            <img id="agencyLogo" class="agency-logo" alt="Logo agencji">
+                            <div>
+                                <div class="agency-name" id="agencyName">BIURO SZERYFA HRABSTWA BLAINE</div>
+                                <div class="agency-subtitle" id="agencySubtitle">DEPARTMENT OF JUSTICE</div>
+                                <div class="legal-citation" id="legalCitation">CAL. PENAL CODE §§ 187, 211, 207 | U.S.C. CONST. AMEND. IV, V, VI, XIV</div>
+                                <div class="wanted-title">POSZUKIWANY</div>
+                                <div class="wanted-subtitle" id="wantedSubtitle">ZA PRZESTĘPSTWA PRZECIWKO PRAWU</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ZAWARTOŚĆ -->
+                    <div class="poster-content">
+                        <!-- ZDJĘCIE -->
+                        <div class="photo-column">
+                            <div class="wanted-photo-container">
+                                <img id="wantedPhoto" alt="Zdjęcie poszukiwanego">
+                                <div class="wanted-photo-placeholder" id="wantedPhotoPlaceholder">
+                                    <i class="fas fa-user-secret"></i>
+                                    <p>BRAK ZDJĘCIA</p>
+                                    <p>DOSTĘPNEGO</p>
+                                </div>
+                            </div>
+                            <div class="photo-label">WIZERUNEK POSZUKIWANEGO</div>
+                        </div>
+                        
+                        <!-- SZCZEGÓŁY -->
+                        <div class="details-column">
+                            <div class="case-number" id="caseNumberDisplay">SPRAWA NR: BCSO-#####</div>
+                            
+                            <div class="wanted-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">IMIĘ I NAZWISKO:</span>
+                                    <span class="detail-value" id="detailName">[PEŁNE IMIĘ I NAZWISKO]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">PRZEZWISKO:</span>
+                                    <span class="detail-value" id="detailAlias">[BRAK PRZEZWISKA]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">WIEK:</span>
+                                    <span class="detail-value" id="detailAge">[WIEK] lat</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">BUDOWA CIAŁA:</span>
+                                    <span class="detail-value" id="detailPhysique">[NIE OKREŚLONO]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">PRZESTĘPSTWO:</span>
+                                    <span class="detail-value" id="detailCrime" style="color: var(--ink-red); font-weight: bold;">[RODZAJ PRZESTĘPSTWA]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">DATA PRZESTĘPSTWA:</span>
+                                    <span class="detail-value" id="detailCrimeDate">[NIEZNANA]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">MIEJSCE:</span>
+                                    <span class="detail-value" id="detailLocation">[NIEZNANE]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">OPIS:</span>
+                                    <span class="detail-value" id="detailDescription">[OPIS PRZESTĘPSTWA]</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">OSTATNIO WIDZIANY:</span>
+                                    <span class="detail-value" id="detailLastSeen">[NIEZNANE]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- STOPKA -->
+                    <div class="poster-footer">
+                        <!-- NAGRODA (PODNIESIONA) -->
+                        <div class="reward-container">
+                            NAGRODA<br>
+                            <span class="reward-amount">$<span id="detailReward">[NAGRODA]</span></span>
+                        </div>
+                        
+                        <div class="warning-text">OSTRZEŻENIE: UWAŻANY ZA NIEBEZPIECZNEGO I UZBROJONEGO</div>
+                        <div class="contact-info">Informacje proszę zgłaszać do: BIURA SZERYFA • HRABSTWO BLAINE</div>
+                        
+                        <!-- PIECZĄTKA I PODPIS -->
+                        <div class="signature-stamp-container">
+                            <div class="stamp-final">
+                                <div class="final-stamp">
+                                    <!-- LOGO NA PIECZĄTCE -->
+                                    <img id="finalStampLogo" class="stamp-logo" alt="Logo na pieczątce">
+                                    <!-- TEKST NA PIECZĄTCE -->
+                                    <div class="stamp-text-overlay">
+                                        <div class="stamp-text">BIURO SZERYFA</div>
+                                        <div class="stamp-text" style="font-size: 0.9rem; color: var(--ink-red);">HRABSTWA BLAINE</div>
+                                        <div class="stamp-text">OFICJALNA PIECZĘĆ</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="signature-final">
+                                <img id="finalSignatureImage" alt="Podpis szeryfa">
+                                <div class="sheriff-name-final" id="finalSheriffName">[IMIĘ I NAZWISKO SZERYFA]</div>
+                                <div class="sheriff-title" id="sheriffTitle">SZERYF HRABSTWA BLAINE</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PRZYCISKI EKSPORTU -->
+                <div class="preview-buttons">
+                    <button id="downloadPdfBtn" class="btn btn-success">
+                        <i class="fas fa-file-pdf"></i> Pobierz PDF
+                    </button>
+                    <button id="downloadImageBtn" class="btn btn-warning">
+                        <i class="fas fa-file-image"></i> Pobierz Obraz
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STOPKA GŁÓWNA -->
+        <div class="main-footer">
+            <p>Stworzone przez: artystek</p>
+            <p>Generator Listów Gończych BCSO - Wersja Finalna</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Zmienne globalne
+            let signaturePad = null;
+            let uploadedLogo = null;
+            let uploadedPhoto = null;
+            let currentCaseNumber = `BCSO-${Math.floor(Math.random() * 90000) + 10000}`;
+            let currentDate = new Date();
+            let formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
+            let selectedCrime = "Napad na bank";
+            let currentStyle = 'western'; // 'western' lub 'formal'
+            
+            // Inicjalizacja podpisu
+            function initSignaturePad() {
+                const canvas = document.getElementById('signatureCanvas');
+                const container = canvas.parentElement;
+                
+                const updateCanvasSize = () => {
+                    const rect = container.getBoundingClientRect();
+                    canvas.width = rect.width;
+                    canvas.height = rect.height;
+                    
+                    if (signaturePad) {
+                        signaturePad.clear();
+                    }
+                };
+                
+                updateCanvasSize();
+                
+                signaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgba(255, 255, 255, 0)',
+                    penColor: 'rgb(44, 24, 16)',
+                    minWidth: 1.5,
+                    maxWidth: 3,
+                    throttle: 16,
+                    velocityFilterWeight: 0.7
+                });
+                
+                // Obsługa przycisków podpisu
+                document.getElementById('clearSignatureBtn').addEventListener('click', function() {
+                    signaturePad.clear();
+                    updateSignaturePreview();
+                });
+                
+                document.getElementById('undoSignatureBtn').addEventListener('click', function() {
+                    const data = signaturePad.toData();
+                    if (data && data.length > 0) {
+                        data.pop();
+                        signaturePad.fromData(data);
+                        updateSignaturePreview();
+                    }
+                });
+                
+                // Aktualizuj podgląd przy zmianie podpisu
+                signaturePad.addEventListener('endStroke', updateSignaturePreview);
+                window.addEventListener('resize', updateCanvasSize);
+            }
+            
+            // Aktualizuj podgląd podpisu
+            function updateSignaturePreview() {
+                const finalSignature = document.getElementById('finalSignatureImage');
+                
+                if (signaturePad && !signaturePad.isEmpty()) {
+                    const signatureDataUrl = signaturePad.toDataURL('image/png');
+                    finalSignature.src = signatureDataUrl;
+                    finalSignature.style.display = 'block';
+                } else {
+                    finalSignature.style.display = 'none';
+                }
+            }
+            
+            // Obsługa przełącznika stylu
+            function initStyleSwitcher() {
+                const westernBtn = document.getElementById('westernStyleBtn');
+                const formalBtn = document.getElementById('formalStyleBtn');
+                const poster = document.getElementById('wantedPoster');
+                
+                westernBtn.addEventListener('click', function() {
+                    if (currentStyle !== 'western') {
+                        currentStyle = 'western';
+                        westernBtn.classList.add('active');
+                        formalBtn.classList.remove('active');
+                        poster.classList.remove('formal');
+                        updateDocumentPreview();
+                    }
+                });
+                
+                formalBtn.addEventListener('click', function() {
+                    if (currentStyle !== 'formal') {
+                        currentStyle = 'formal';
+                        formalBtn.classList.add('active');
+                        westernBtn.classList.remove('active');
+                        poster.classList.add('formal');
+                        updateDocumentPreview();
+                    }
+                });
+            }
+            
+            // Obsługa logo
+            function initLogoHandling() {
+                const logoUpload = document.getElementById('logoUpload');
+                const uploadBtn = document.getElementById('uploadLogoBtn');
+                const removeBtn = document.getElementById('removeLogoBtn');
+                const logoPreview = document.getElementById('logoPreview');
+                const agencyLogo = document.getElementById('agencyLogo');
+                const logoPlaceholder = document.getElementById('logoPlaceholder');
+                const agencyName = document.getElementById('agencyName');
+                const finalStampLogo = document.getElementById('finalStampLogo');
+                
+                uploadBtn.addEventListener('click', function() {
+                    logoUpload.click();
+                });
+                
+                removeBtn.addEventListener('click', function() {
+                    uploadedLogo = null;
+                    logoPreview.style.display = 'none';
+                    agencyLogo.style.display = 'none';
+                    finalStampLogo.style.display = 'none';
+                    logoPlaceholder.style.display = 'flex';
+                    agencyName.textContent = "BIURO SZERYFA HRABSTWA BLAINE";
+                });
+                
+                logoUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            uploadedLogo = e.target.result;
+                            
+                            // Logo w panelu kontrolnym
+                            logoPreview.src = uploadedLogo;
+                            logoPreview.style.display = 'block';
+                            logoPlaceholder.style.display = 'none';
+                            
+                            // Logo na podglądzie
+                            agencyLogo.src = uploadedLogo;
+                            agencyLogo.style.display = 'block';
+                            
+                            // Logo na pieczątce
+                            finalStampLogo.src = uploadedLogo;
+                            finalStampLogo.style.display = 'block';
+                            finalStampLogo.style.maxWidth = '120px';
+                            finalStampLogo.style.maxHeight = '120px';
+                            
+                            // Opcjonalna zmiana nazwy departamentu
+                            const customName = prompt("Wprowadź nazwę swojego departamentu (lub zostaw puste):", "BIURO SZERYFA HRABSTWA BLAINE");
+                            if (customName && customName.trim() !== "") {
+                                agencyName.textContent = customName.trim().toUpperCase();
+                            }
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Obsługa zdjęcia
+            function initPhotoHandling() {
+                const photoUpload = document.getElementById('photoUpload');
+                const uploadBtn = document.getElementById('uploadPhotoBtn');
+                const removeBtn = document.getElementById('removePhotoBtn');
+                const photoPreview = document.getElementById('photoPreview');
+                const wantedPhoto = document.getElementById('wantedPhoto');
+                const photoPlaceholder = document.getElementById('photoPlaceholder');
+                const wantedPhotoPlaceholder = document.getElementById('wantedPhotoPlaceholder');
+                
+                uploadBtn.addEventListener('click', function() {
+                    photoUpload.click();
+                });
+                
+                removeBtn.addEventListener('click', function() {
+                    uploadedPhoto = null;
+                    photoPreview.style.display = 'none';
+                    wantedPhoto.style.display = 'none';
+                    photoPlaceholder.style.display = 'flex';
+                    wantedPhotoPlaceholder.style.display = 'flex';
+                });
+                
+                photoUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            uploadedPhoto = e.target.result;
+                            photoPreview.src = uploadedPhoto;
+                            photoPreview.style.display = 'block';
+                            photoPlaceholder.style.display = 'none';
+                            
+                            wantedPhoto.src = uploadedPhoto;
+                            wantedPhoto.style.display = 'block';
+                            wantedPhotoPlaceholder.style.display = 'none';
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Obsługa przestępstwa
+            function initCrimeHandling() {
+                const crimeSelect = document.getElementById('crime');
+                const customCrimeContainer = document.getElementById('customCrimeContainer');
+                const customCrimeInput = document.getElementById('customCrime');
+                const useCustomBtn = document.getElementById('useCustomCrimeBtn');
+                
+                crimeSelect.addEventListener('change', function() {
+                    if (this.value === 'custom') {
+                        customCrimeContainer.style.display = 'flex';
+                    } else {
+                        customCrimeContainer.style.display = 'none';
+                        selectedCrime = this.value;
+                        updateDocumentPreview();
+                    }
+                });
+                
+                useCustomBtn.addEventListener('click', function() {
+                    if (customCrimeInput.value.trim() !== "") {
+                        selectedCrime = customCrimeInput.value.trim();
+                        updateDocumentPreview();
+                    }
+                });
+                
+                customCrimeInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        if (customCrimeInput.value.trim() !== "") {
+                            selectedCrime = customCrimeInput.value.trim();
+                            updateDocumentPreview();
+                        }
+                    }
+                });
+            }
+            
+            // Funkcja do generowania cytatów prawnych
+            function getLegalCitation(crime) {
+                const citations = {
+                    "Napad na bank": "CAL. PENAL CODE §§ 211, 212.5 | 18 U.S.C. § 2113",
+                    "Morderstwo": "CAL. PENAL CODE § 187 | 18 U.S.C. § 1111",
+                    "Porwanie": "CAL. PENAL CODE § 207 | 18 U.S.C. § 1201",
+                    "Kradzież": "CAL. PENAL CODE § 484 | 18 U.S.C. § 661",
+                    "Przemyt": "CAL. PENAL CODE § 182 | 18 U.S.C. § 545",
+                    "Napaść": "CAL. PENAL CODE § 240 | 18 U.S.C. § 113",
+                    "Vandalizm": "CAL. PENAL CODE § 594 | 18 U.S.C. § 1361"
+                };
+                
+                return citations[crime] || "CAL. PENAL CODE §§ 187, 211, 207 | U.S. CONST. AMEND. IV, V, VI, XIV";
+            }
+            
+            // Aktualizacja podglądu dokumentu
+            function updateDocumentPreview() {
+                // Pobierz wartości z formularza
+                const name = document.getElementById('name').value.trim() || "[PEŁNE IMIĘ I NAZWISKO]";
+                const alias = document.getElementById('alias').value.trim() || "[BRAK PRZEZWISKA]";
+                const age = document.getElementById('age').value || "[WIEK]";
+                const height = document.getElementById('height').value;
+                const weight = document.getElementById('weight').value;
+                const crimeDescription = document.getElementById('crimeDescription').value.trim() || "[OPIS PRZESTĘPSTWA]";
+                const crimeDate = document.getElementById('crimeDate').value;
+                const location = document.getElementById('location').value.trim() || "[NIEZNANE]";
+                const reward = document.getElementById('reward').value || "[NAGRODA]";
+                const sheriffName = document.getElementById('sheriffName').value.trim() || "[IMIĘ I NAZWISKO SZERYFA]";
+                const lastSeen = document.getElementById('lastSeen').value.trim() || "[NIEZNANE]";
+                const customCaseNumber = document.getElementById('caseNumber').value.trim();
+                
+                // Użyj custom numeru sprawy lub wygeneruj nowy
+                const displayCaseNumber = customCaseNumber ? customCaseNumber : currentCaseNumber;
+                
+                // Formatuj datę przestępstwa
+                let formattedCrimeDate = "[NIEZNANA]";
+                if (crimeDate) {
+                    const dateObj = new Date(crimeDate);
+                    formattedCrimeDate = `${dateObj.getDate().toString().padStart(2, '0')}.${(dateObj.getMonth() + 1).toString().padStart(2, '0')}.${dateObj.getFullYear()}`;
+                }
+                
+                // Formatuj dane fizyczne
+                let physique = "[NIE OKREŚLONO]";
+                if (height && weight) {
+                    physique = `${height}cm / ${weight}kg`;
+                } else if (height) {
+                    physique = `${height}cm`;
+                } else if (weight) {
+                    physique = `${weight}kg`;
+                }
+                
+                // Aktualizuj podgląd
+                document.getElementById('caseNumberDisplay').textContent = `SPRAWA NR: ${displayCaseNumber}`;
+                document.getElementById('detailName').textContent = name.toUpperCase();
+                document.getElementById('detailAlias').textContent = alias.toUpperCase();
+                document.getElementById('detailAge').textContent = `${age} lat`;
+                document.getElementById('detailPhysique').textContent = physique;
+                document.getElementById('detailCrime').textContent = selectedCrime.toUpperCase();
+                document.getElementById('detailCrimeDate').textContent = formattedCrimeDate;
+                document.getElementById('detailLocation').textContent = location.toUpperCase();
+                document.getElementById('detailDescription').textContent = crimeDescription;
+                document.getElementById('detailLastSeen').textContent = lastSeen.toUpperCase();
+                document.getElementById('detailReward').textContent = parseInt(reward).toLocaleString('pl-PL');
+                
+                // Aktualizuj nazwę szeryfa
+                document.getElementById('finalSheriffName').textContent = sheriffName.toUpperCase();
+                
+                // Aktualizuj watermark i inne elementy w zależności od stylu
+                const watermarkText = document.getElementById('watermarkText');
+                const sheriffTitle = document.getElementById('sheriffTitle');
+                
+                if (currentStyle === 'formal') {
+                    watermarkText.textContent = "URZĘDOWY";
+                    document.getElementById('legalCitation').textContent = getLegalCitation(selectedCrime);
+                    document.getElementById('agencyName').textContent = "DEPARTMENT OF JUSTICE";
+                    document.getElementById('agencySubtitle').textContent = "BLAINE COUNTY SHERIFF'S OFFICE";
+                    document.getElementById('wantedSubtitle').textContent = "WANTED FOR FELONY CHARGES";
+                    document.getElementById('detailCrime').style.color = "var(--seal-red)";
+                    
+                    if (sheriffTitle) {
+                        sheriffTitle.textContent = "SHERIFF, BLAINE COUNTY";
+                        sheriffTitle.style.display = "block";
+                    }
+                } else {
+                    watermarkText.textContent = name.split(' ')[0] || "POSZUKIWANY";
+                    document.getElementById('agencyName').textContent = "BIURO SZERYFA HRABSTWA BLAINE";
+                    document.getElementById('agencySubtitle').textContent = "DEPARTMENT OF JUSTICE";
+                    document.getElementById('wantedSubtitle').textContent = "ZA PRZESTĘPSTWA PRZECIWKO PRAWU";
+                    document.getElementById('detailCrime').style.color = "var(--ink-red)";
+                    
+                    if (sheriffTitle) {
+                        sheriffTitle.textContent = "SZERYF HRABSTWA BLAINE";
+                        sheriffTitle.style.display = "block";
+                    }
+                }
+            }
+            
+            // Generuj PDF
+            async function generatePDF() {
+                // Sprawdź wymagane pola
+                const name = document.getElementById('name').value.trim();
+                if (!name) {
+                    alert('Proszę wpisać imię i nazwisko poszukiwanego.');
+                    return null;
+                }
+                
+                if (!signaturePad || signaturePad.isEmpty()) {
+                    alert('Proszę dodać podpis szeryfa.');
+                    return null;
+                }
+                
+                const sheriffName = document.getElementById('sheriffName').value.trim();
+                if (!sheriffName) {
+                    alert('Proszę wpisać imię i nazwisko szeryfa.');
+                    return null;
+                }
+                
+                try {
+                    // Utwórz kontener dla PDF
+                    const pdfContainer = document.createElement('div');
+                    pdfContainer.style.position = 'absolute';
+                    pdfContainer.style.left = '-9999px';
+                    pdfContainer.style.width = '794px';
+                    pdfContainer.style.height = '1123px';
+                    pdfContainer.style.padding = '50px';
+                    pdfContainer.style.backgroundColor = currentStyle === 'formal' ? 'white' : '#f5e8c6';
+                    pdfContainer.style.fontFamily = currentStyle === 'formal' ? "'Roboto', sans-serif" : "'Old Standard TT', serif";
+                    
+                    // Skopiuj i dostosuj plakat
+                    const poster = document.getElementById('wantedPoster').cloneNode(true);
+                    
+                    poster.className = 'wanted-poster';
+                    if (currentStyle === 'formal') {
+                        poster.classList.add('formal');
+                    }
+                    
+                    poster.style.width = '100%';
+                    poster.style.height = '100%';
+                    poster.style.border = currentStyle === 'formal' ? '2px solid #1a365d' : '15px solid #5d2906';
+                    poster.style.borderRadius = currentStyle === 'formal' ? '0' : '5px';
+                    poster.style.padding = currentStyle === 'formal' ? '40px' : '30px';
+                    poster.style.boxShadow = 'none';
+                    poster.style.transform = 'none';
+                    poster.style.position = 'relative';
+                    poster.style.overflow = 'hidden';
+                    
+                    // Upewnij się, że elementy są widoczne
+                    const wantedPhoto = poster.querySelector('#wantedPhoto');
+                    const placeholder = poster.querySelector('#wantedPhotoPlaceholder');
+                    const finalSignature = poster.querySelector('#finalSignatureImage');
+                    const agencyLogo = poster.querySelector('#agencyLogo');
+                    const finalStampLogo = poster.querySelector('#finalStampLogo');
+                    
+                    if (uploadedPhoto && wantedPhoto) {
+                        wantedPhoto.src = uploadedPhoto;
+                        wantedPhoto.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    }
+                    
+                    if (signaturePad && !signaturePad.isEmpty() && finalSignature) {
+                        finalSignature.src = signaturePad.toDataURL('image/png');
+                        finalSignature.style.display = 'block';
+                        finalSignature.style.maxWidth = '300px';
+                    }
+                    
+                    if (uploadedLogo) {
+                        if (agencyLogo) {
+                            agencyLogo.src = uploadedLogo;
+                            agencyLogo.style.display = 'block';
+                            agencyLogo.style.maxHeight = '80px';
+                        }
+                        if (finalStampLogo) {
+                            finalStampLogo.src = uploadedLogo;
+                            finalStampLogo.style.display = 'block';
+                            finalStampLogo.style.maxWidth = '100px';
+                            finalStampLogo.style.maxHeight = '100px';
+                        }
+                    }
+                    
+                    pdfContainer.appendChild(poster);
+                    document.body.appendChild(pdfContainer);
+                    
+                    // Generuj obraz
+                    const canvas = await html2canvas(pdfContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: currentStyle === 'formal' ? 'white' : '#f5e8c6',
+                        logging: false,
+                        allowTaint: true,
+                        width: 794,
+                        height: 1123
+                    });
+                    
+                    document.body.removeChild(pdfContainer);
+                    
+                    // Stwórz PDF
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4',
+                        compress: true
+                    });
+                    
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    
+                    const width = pdfWidth;
+                    const height = (imgHeight * pdfWidth) / imgWidth;
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, width, height, '', 'FAST');
+                    
+                    return pdf;
+                    
+                } catch (error) {
+                    console.error('Błąd generowania PDF:', error);
+                    alert('Wystąpił błąd podczas generowania PDF. Spróbuj ponownie.');
+                    return null;
+                }
+            }
+            
+            // Pobierz PDF
+            async function downloadPDF() {
+                const pdf = await generatePDF();
+                if (pdf) {
+                    const name = document.getElementById('name').value.trim().replace(/\s+/g, '_');
+                    const style = currentStyle === 'formal' ? 'FORMAL' : 'WESTERN';
+                    pdf.save(`POSZUKIWANY_${name}_${style}_${currentCaseNumber}.pdf`);
+                }
+            }
+            
+            // Pobierz obraz
+            async function downloadImage() {
+                const name = document.getElementById('name').value.trim();
+                if (!name) {
+                    alert('Proszę wpisać imię i nazwisko poszukiwanego.');
+                    return;
+                }
+                
+                if (!signaturePad || signaturePad.isEmpty()) {
+                    alert('Proszę dodać podpis szeryfa.');
+                    return;
+                }
+                
+                const sheriffName = document.getElementById('sheriffName').value.trim();
+                if (!sheriffName) {
+                    alert('Proszę wpisać imię i nazwisko szeryfa.');
+                    return;
+                }
+                
+                try {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.position = 'absolute';
+                    imgContainer.style.left = '-9999px';
+                    imgContainer.style.width = '1200px';
+                    imgContainer.style.padding = currentStyle === 'formal' ? '40px' : '50px';
+                    imgContainer.style.backgroundColor = currentStyle === 'formal' ? 'white' : '#f5e8c6';
+                    imgContainer.style.fontFamily = currentStyle === 'formal' ? "'Roboto', sans-serif" : "'Old Standard TT', serif";
+                    
+                    const poster = document.getElementById('wantedPoster').cloneNode(true);
+                    
+                    poster.style.width = '100%';
+                    poster.style.border = currentStyle === 'formal' ? '2px solid #1a365d' : '15px solid #5d2906';
+                    poster.style.padding = currentStyle === 'formal' ? '40px' : '40px';
+                    poster.style.boxShadow = 'none';
+                    
+                    const wantedPhoto = poster.querySelector('#wantedPhoto');
+                    const placeholder = poster.querySelector('#wantedPhotoPlaceholder');
+                    const finalSignature = poster.querySelector('#finalSignatureImage');
+                    const agencyLogo = poster.querySelector('#agencyLogo');
+                    const finalStampLogo = poster.querySelector('#finalStampLogo');
+                    
+                    if (uploadedPhoto && wantedPhoto) {
+                        wantedPhoto.src = uploadedPhoto;
+                        wantedPhoto.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    }
+                    
+                    if (signaturePad && !signaturePad.isEmpty() && finalSignature) {
+                        finalSignature.src = signaturePad.toDataURL('image/png');
+                        finalSignature.style.display = 'block';
+                    }
+                    
+                    if (uploadedLogo) {
+                        if (agencyLogo) {
+                            agencyLogo.src = uploadedLogo;
+                            agencyLogo.style.display = 'block';
+                        }
+                        if (finalStampLogo) {
+                            finalStampLogo.src = uploadedLogo;
+                            finalStampLogo.style.display = 'block';
+                            finalStampLogo.style.maxWidth = '120px';
+                            finalStampLogo.style.maxHeight = '120px';
+                        }
+                    }
+                    
+                    imgContainer.appendChild(poster);
+                    document.body.appendChild(imgContainer);
+                    
+                    const canvas = await html2canvas(imgContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: currentStyle === 'formal' ? 'white' : '#f5e8c6',
+                        logging: false
+                    });
+                    
+                    document.body.removeChild(imgContainer);
+                    
+                    const link = document.createElement('a');
+                    const style = currentStyle === 'formal' ? 'FORMAL' : 'WESTERN';
+                    const fileName = `POSZUKIWANY_${name.replace(/\s+/g, '_')}_${style}_${currentCaseNumber}.png`;
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                } catch (error) {
+                    console.error('Błąd generowania obrazu:', error);
+                    alert('Wystąpił błąd podczas generowania obrazu. Spróbuj ponownie.');
+                }
+            }
+            
+            // Wyczyść formularz
+            function clearForm() {
+                if (confirm('Czy na pewno chcesz wyczyścić cały formularz? Wszystkie wprowadzone dane zostaną utracone.')) {
+                    document.getElementById('name').value = '';
+                    document.getElementById('alias').value = '';
+                    document.getElementById('age').value = '';
+                    document.getElementById('height').value = '';
+                    document.getElementById('weight').value = '';
+                    document.getElementById('crime').selectedIndex = 0;
+                    document.getElementById('customCrime').value = '';
+                    document.getElementById('customCrimeContainer').style.display = 'none';
+                    document.getElementById('crimeDescription').value = '';
+                    document.getElementById('crimeDate').value = '';
+                    document.getElementById('location').value = '';
+                    document.getElementById('reward').value = '5000';
+                    document.getElementById('sheriffName').value = '';
+                    document.getElementById('lastSeen').value = '';
+                    document.getElementById('caseNumber').value = '';
+                    
+                    selectedCrime = "Napad na bank";
+                    
+                    uploadedPhoto = null;
+                    const photoPreview = document.getElementById('photoPreview');
+                    const wantedPhoto = document.getElementById('wantedPhoto');
+                    const photoPlaceholder = document.getElementById('photoPlaceholder');
+                    const wantedPhotoPlaceholder = document.getElementById('wantedPhotoPlaceholder');
+                    
+                    photoPreview.style.display = 'none';
+                    wantedPhoto.style.display = 'none';
+                    photoPlaceholder.style.display = 'flex';
+                    wantedPhotoPlaceholder.style.display = 'flex';
+                    
+                    if (signaturePad) {
+                        signaturePad.clear();
+                        updateSignaturePreview();
+                    }
+                    
+                    currentCaseNumber = `BCSO-${Math.floor(Math.random() * 90000) + 10000}`;
+                    
+                    updateDocumentPreview();
+                }
+            }
+            
+            // Inicjalizacja nasłuchiwania zdarzeń
+            function initEventListeners() {
+                const formInputs = ['name', 'alias', 'age', 'height', 'weight', 'crimeDescription', 'crimeDate', 'location', 'reward', 'sheriffName', 'lastSeen', 'caseNumber'];
+                formInputs.forEach(inputId => {
+                    const element = document.getElementById(inputId);
+                    if (element) {
+                        element.addEventListener('input', updateDocumentPreview);
+                        element.addEventListener('change', updateDocumentPreview);
+                    }
+                });
+                
+                document.getElementById('generateBtn').addEventListener('click', updateDocumentPreview);
+                document.getElementById('clearFormBtn').addEventListener('click', clearForm);
+                document.getElementById('downloadPdfBtn').addEventListener('click', downloadPDF);
+                document.getElementById('downloadImageBtn').addEventListener('click', downloadImage);
+                
+                document.getElementById('caseNumber').addEventListener('blur', function() {
+                    if (!this.value.trim()) {
+                        currentCaseNumber = `BCSO-${Math.floor(Math.random() * 90000) + 10000}`;
+                        updateDocumentPreview();
+                    }
+                });
+            }
+            
+            // Inicjalizacja aplikacji
+            function initApp() {
+                initSignaturePad();
+                initStyleSwitcher();
+                initLogoHandling();
+                initPhotoHandling();
+                initCrimeHandling();
+                initEventListeners();
+                updateDocumentPreview();
+                
+                const today = new Date();
+                const formattedToday = today.toISOString().split('T')[0];
+                document.getElementById('crimeDate').value = formattedToday;
+                
+                console.log('Generator Listów Gończych - gotowy!');
+            }
+            
+            // Uruchom aplikację
+            initApp();
+        });
+    </script>
+</body>
+</html>
